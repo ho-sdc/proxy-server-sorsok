@@ -12,7 +12,8 @@ const suggestionsServer =
   'http://ec2-18-216-119-172.us-east-2.compute.amazonaws.com:3002';
 const searchServer =
   'http://ec2-18-217-232-247.us-east-2.compute.amazonaws.com:3003';
-const productServer = 'http://ec2-18-212-94-82.compute-1.amazonaws.com:3004';
+const productServer =
+  'http://ec2-18-216-194-137.us-east-2.compute.amazonaws.com:3002';
 const reviewsServer =
   'http://ec2-13-59-217-231.us-east-2.compute.amazonaws.com:3005';
 
@@ -22,11 +23,22 @@ app.use(parser.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 app.use(cors());
 
+app.get('/', (req, res) => {
+  let id = Math.floor(Math.random() * 100);
+  res.clearCookie('id');
+  res.cookie('id', id);
+  res.sendFile(path.resolve(__dirname, './public/index.html'));
+});
+
+app.get('/styles.css', (req, res) => {
+  res.sendFile(path.resolve(__dirname, './public/styles.css'));
+});
+
 app.get('/suggestions', (req, res) => {
   axios
     .get(suggestionsServer + '/suggestions', {
       params: {
-        id: id
+        id: req.cookies.id
       }
     })
     .then(({ data }) => res.send(JSON.stringify(data)))
@@ -43,7 +55,7 @@ app.get('/search/:keyword', (req, res) => {
 
 app.get('/abibas/product', (req, res) => {
   axios
-    .get(productServer + '/abibas/product/' + id)
+    .get(productServer + '/abibas/product/' + req.cookies.id)
     .then(({ data }) => res.send(data))
     .catch(err => res.send(err));
 });
@@ -52,7 +64,7 @@ app.get('/reviews', (req, res) => {
   axios
     .get(reviewsServer + '/reviews', {
       params: {
-        id: id
+        id: req.cookies.id
       }
     })
     .then(({ data }) => res.send(JSON.stringify(data)))
@@ -63,7 +75,7 @@ app.get('/reviews/stats', (req, res) => {
   axios
     .get(reviewsServer + '/reviews/stats', {
       params: {
-        id: id
+        id: req.cookies.id
       }
     })
     .then(({ data }) => res.send(JSON.stringify(data)))
