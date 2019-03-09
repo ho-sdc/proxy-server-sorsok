@@ -70,4 +70,4 @@ app.get('/reviews/stats', (req, res) => {
     .catch(err => res.send(err));
 });
 
-app.listen(port, () => console.log(`Server running on port ${port}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
